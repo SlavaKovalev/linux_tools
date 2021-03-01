@@ -44,8 +44,9 @@ static unsigned long find_sym(const char *sym){
 int __init syscall_table_dump_init(void){
 	int i = 0;
 	p_sys_call_table = (void**)find_sym("sys_call_table");
+	printk("sys_call_tabe=%p\n", p_sys_call_table);
 	for (i = 0; i < sizeof(syscalls_map)/sizeof(struct syscall_entry); ++i){
-		printk("%s=%p\n", syscalls_map[i].name, p_sys_call_table[syscalls_map[i].pos]);
+		printk("%s=%u\n", syscalls_map[i].name, (unsigned int)p_sys_call_table[syscalls_map[i].pos]);
 	}
 	return 0;
 }
