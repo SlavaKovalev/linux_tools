@@ -169,12 +169,12 @@ void hook_sys_call(int sys_call_ind) {
 	}
 }
 
-int __init syscall_hook_mod_init(void){
+int __init syscall_hook_activate(void){
 	int ret = 0;
 	unsigned long irq_flags = 0;
-	printk("[syscall_hook] init\n");
 	p_sys_call_table = (void**)find_sym("sys_call_table");
-	printk("[syscall_hook] sys_call_table %u\n", p_sys_call_table);
+	if (p_sys_call_table == NULL)
+		return ENOTSUP;
 
 	preempt_disable();
 	local_irq_save(irq_flags);
@@ -194,8 +194,7 @@ int __init syscall_hook_mod_init(void){
 	return ret;
 }
 
-void __exit syscall_hook_mod_exit(void){
-	printk("[syscall_hook] exit\n");
+void __exit syscall_hook_deactivate(void){
 	preempt_disable();
 	unsigned long irq_flags = 0;
 	local_irq_save(irq_flags);
@@ -209,14 +208,9 @@ void __exit syscall_hook_mod_exit(void){
 	local_irq_restore(irq_flags);
 	irq_flags = 0;
 	preempt_enable();
-	printk("sys_read_count=%u\n", sys_read_count);
-	printk("sys_creat_count=%u\n", sys_creat_count);
-	printk("sys_open_count=%u\n", sys_open_count);
-	printk("sys_write_count=%u\n", sys_write_count);
-	printk("sys_unlink_count=%u\n", sys_unlink_count);
 }
 
-module_init(syscall_hook_mod_init);
-module_exit(syscall_hook_mod_exit);
+module_init(syscall_hook_activate);
+module_exit(syscall_hook_deactivate);
 
 MODULE_LICENSE("GPL");
